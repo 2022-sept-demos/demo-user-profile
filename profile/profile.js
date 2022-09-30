@@ -3,6 +3,7 @@ import {
     getProfile,
     getUser,
     updateProfile,
+    uploadImage,
 } from '../fetch-utils.js';
 
 const errorDisplay = document.getElementById('error-display');
@@ -10,8 +11,8 @@ const profileForm = document.getElementById('profile-form');
 const updateButton = profileForm.querySelector('button');
 const userNameInput = profileForm.querySelector('[name=user_name]');
 const bioTextArea = profileForm.querySelector('[name=bio]');
-// const avatarInput = profileForm.querySelector('[name=avatar_url]');
-// const preview = document.getElementById('preview');
+const avatarInput = profileForm.querySelector('[name=avatar]');
+const preview = document.getElementById('preview');
 
 const user = getUser();
 
@@ -33,10 +34,10 @@ window.addEventListener('load', async () => {
     }
 });
 
-// avatarInput.addEventListener('change', () => {
-//     const file = avatarInput.files[0];
-//     preview.src = URL.createObjectURL(file);
-// });
+avatarInput.addEventListener('change', () => {
+    const file = avatarInput.files[0];
+    preview.src = URL.createObjectURL(file);
+});
 
 profileForm.addEventListener('submit', async (e) => {
     // keep the form from changing the browser page
@@ -58,6 +59,15 @@ profileForm.addEventListener('submit', async (e) => {
     };
 
     // > Upload Avatar
+    const avatarFile = formData.get('avatar');
+    if (avatarFile.size > 0) {
+        const avatarPath = `${user.id}/${avatarFile.name}`;
+        profileUpdate.avatar_url = await uploadImage(
+            'avatars',
+            avatarPath,
+            avatarFile
+        );
+    }
 
     // > Update Profile
     const response = await updateProfile(profileUpdate);
@@ -83,7 +93,7 @@ function displayProfile() {
     userNameInput.value = profile.user_name;
     bioTextArea.value = profile.bio;
     // load preview of existing profile
-    // if (profile.avatar_url) {
-    //     preview.src = profile.avatar_url;
-    // }
+    if (profile.avatar_url) {
+        preview.src = profile.avatar_url;
+    }
 }

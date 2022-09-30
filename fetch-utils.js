@@ -51,27 +51,26 @@ export async function getProfiles() {
     return await client.from('profiles').select().limit(100);
 }
 
-// export async function uploadImage(bucketName, imageName, imageFile) {
-//     // we can use the storage bucket to upload the image,
-//     // then use it to get the public URL
-//     const bucket = client.storage.from(bucketName);
+export async function uploadImage(bucketName, imageName, imageFile) {
+    // we can use the storage bucket to upload the image,
+    // then use it to get the public URL
+    const bucket = client.storage.from(bucketName);
 
-//     const response = await bucket.upload(imageName, imageFile, {
-//         cacheControl: '3600',
-//         // in this case, we will _replace_ any
-//         // existing file with same name.
-//         upsert: true,
-//     });
+    const response = await bucket.upload(imageName, imageFile, {
+        cacheControl: '3600',
+        // in this case, we will _replace_ any
+        // existing file with same name.
+        upsert: true,
+    });
 
-//     if (response.error) {
-//         // eslint-disable-next-line no-console
-//         console.log(response.error);
-//         return null;
-//     }
+    if (response.error) {
+        // eslint-disable-next-line no-console
+        console.log(response.error);
+        return null;
+    }
 
-//     // so we will make it ourselves.
-//     // note that we exported the url from `./client.js`
-//     const url = `${SUPABASE_URL}/storage/v1/object/public/${response.data.Key}`;
+    // Construct the URL to this image:
+    const url = `${SUPABASE_URL}/storage/v1/object/public/${response.data.Key}`;
 
-//     return url;
-// }
+    return url;
+}
